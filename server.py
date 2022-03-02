@@ -14,13 +14,7 @@ try:
     mongo.server_info()
 except:
     print("Error - cannot connect to db")
-
-
-
 ##############################
-
-
-
 @app.route("/users", methods = ["GET"])
 def get_some_users():
     try: 
@@ -46,13 +40,7 @@ def get_some_users():
             status= 500,
             mimetype="application/json"
         )
-
-
-
 ##############################
-
-
-
 @app.route("/users", methods = ['POST'])
 def create_user():
     try: 
@@ -79,8 +67,6 @@ def create_user():
         print(ex)
         print("*********")
 ##############################
-
-
 @app.route("/users/<id>", methods  = ["PATCH"])
 def update_user(id):
     # return id
@@ -131,11 +117,47 @@ def update_user(id):
             status= 500,
             mimetype="application/json"
         )
-
-
 ##############################
-
-
-
+@app.route("/users/<id>", methods = ["DELETE"])
+def delete_user(id):
+    try: 
+        dbResponse = db.users.delete_one({"_id":ObjectId(id)})
+        # for attr in dir(dbResponse):
+        #     print(f"*****{attr}*****")
+        if dbResponse.deleted_count == 1:
+            return Response(
+        response= json.dumps(
+                {
+                "message":"user deleted",
+                "id":f"{id}"
+                }
+            ),
+            status= 200,
+            mimetype="application/json"
+        )
+        return Response(
+        response= json.dumps(
+                {
+                "message":"user not found",
+                "id":f"{id}"
+                }
+            ),
+            status= 500,
+            mimetype="application/json"
+        )
+    except Exception as ex:
+        print("**********")
+        print(ex)
+        print("**********")
+        return Response(
+            response= json.dumps(
+                {
+                "message":"sorry cannot delete user",
+                }
+            ),
+            status= 500,
+            mimetype="application/json"
+        )
+##############################
 if __name__ == "__main__":
     app.run(port=5555, debug = True)
