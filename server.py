@@ -81,6 +81,61 @@ def create_user():
 ##############################
 
 
+@app.route("/users/<id>", methods  = ["PATCH"])
+def update_user(id):
+    # return id
+    try: 
+        dbResponse = db.users.update_one(
+            {
+                "_id": ObjectId(id),
+            },
+            {
+                "$set": {
+                    "name":request.form["name"], 
+                    "lastName":request.form["lastName"]
+                    }
+            }
+        )
+        # for attr in dir(dbResponse):
+        #     print(f"**********{attr}********")
+        if dbResponse.modified_count == 1:
+            return Response(
+                response= json.dumps(
+                    {
+                    "message":"user updated",
+                    }
+                ),
+                status= 200,
+                mimetype="application/json"
+            )
+        return Response(
+            response= json.dumps(
+                   {
+                  "message":"nothing to update",
+                }
+            ),
+            status= 200,
+            mimetype="application/json"
+        )
+    except Exception as ex:
+        print("**********")
+        print(ex)
+        print("**********")
+        return Response(
+            response= json.dumps(
+                {
+                "message":"sorry cannot update user",
+                "id":f"{dbResponse.inserted_id}"
+                }
+            ),
+            status= 500,
+            mimetype="application/json"
+        )
+
+
+##############################
+
+
 
 if __name__ == "__main__":
     app.run(port=5555, debug = True)
